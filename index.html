@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>We10 BC परिवार फंड</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="brand-icon">₹</div>
+        <div>
+          <span class="brand-name">We10 BC</span>
+          <span class="brand-sub">परिवार फंड</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#" class="nav-link active" data-tab="dashboard">डैशबोर्ड</a>
+        <a href="#" class="nav-link" data-tab="members">सदस्य</a>
+        <a href="#" class="nav-link" data-tab="loans">ऋण</a>
+        <a href="#" class="nav-link" data-tab="howit">कैसे काम करता है</a>
+        <a href="#" class="nav-link" data-tab="rules">नियम</a>
+      </nav>
+      <!-- Sync Status + Button -->
+      <div class="sync-area">
+        <span class="sync-status" id="syncStatus"></span>
+        <button class="sync-btn" id="syncBtn" title="Google Sheet से ताज़ा डेटा लें">
+          <span class="sync-icon" id="syncIcon">⟳</span> अपडेट करें
+        </button>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="मेनू">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="#" class="nav-link active" data-tab="dashboard">डैशबोर्ड</a>
+      <a href="#" class="nav-link" data-tab="members">सदस्य</a>
+      <a href="#" class="nav-link" data-tab="loans">ऋण</a>
+      <a href="#" class="nav-link" data-tab="howit">कैसे काम करता है</a>
+      <a href="#" class="nav-link" data-tab="rules">नियम</a>
+      <div class="mobile-sync">
+        <button class="sync-btn" id="syncBtnMobile">⟳ डेटा अपडेट करें</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p>Google Sheet से डेटा लोड हो रहा है…</p>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+
+    <!-- ==================== DASHBOARD TAB ==================== -->
+    <section id="tab-dashboard" class="tab-section active">
+
+      <!-- Hero Banner -->
+      <div class="hero">
+        <div class="hero-text">
+          <p class="hero-eyebrow">We10 BC परिवार फंड</p>
+          <h1 class="hero-title">परिवार का, परिवार के लिए</h1>
+          <p class="hero-sub">पारदर्शिता · अनुशासन · पारस्परिक सहयोग</p>
+        </div>
+        <div class="hero-badge">
+          <div class="badge-label">XIRR रिटर्न</div>
+          <div class="badge-value" id="heroXirr">17.35%</div>
+          <div class="badge-note">प्रतिवर्ष · अक्टूबर 2020 से</div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card accent-green">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-label">कुल फंड मूल्य</div>
+          <div class="kpi-value" id="kpiGross">₹54,68,744</div>
+          <div class="kpi-note" id="kpiDate">07 सितंबर 2026 तक</div>
+        </div>
+        <div class="kpi-card accent-blue">
+          <div class="kpi-icon">🏛️</div>
+          <div class="kpi-label">शुद्ध BC पूंजी</div>
+          <div class="kpi-value" id="kpiNet">₹47,81,676</div>
+          <div class="kpi-note">स्मारक फंड को छोड़कर</div>
+        </div>
+        <div class="kpi-card accent-purple">
+          <div class="kpi-icon">💠</div>
+          <div class="kpi-label">प्रति यूनिट मूल्य</div>
+          <div class="kpi-value" id="kpiPerUnit">₹1,16,626</div>
+          <div class="kpi-note" id="kpiCostBasis">लागत आधार ₹64,235</div>
+        </div>
+        <div class="kpi-card accent-amber">
+          <div class="kpi-icon">🕊️</div>
+          <div class="kpi-label">Nmn-ND स्मारक फंड</div>
+          <div class="kpi-value" id="kpiMemorial">₹6,87,068</div>
+          <div class="kpi-note">लक्ष्य: 15% प्रतिवर्ष · 2035 तक</div>
+        </div>
+      </div>
+
+      <!-- Two-column section -->
+      <div class="two-col">
+
+        <!-- Fund Projections -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📅 फंड अनुमान</h2>
+          </div>
+          <div class="projection-table">
+            <div class="proj-row proj-header">
+              <span>तारीख</span>
+              <span>कुल मूल्य</span>
+              <span>शुद्ध BC</span>
+              <span>प्रति यूनिट</span>
+            </div>
+            <div class="proj-row" id="projRow1">
+              <span class="proj-date today-tag">07/09/26 <em>आज</em></span>
+              <span>₹54,68,744</span>
+              <span>₹47,81,676</span>
+              <span class="highlight">₹1,16,626</span>
+            </div>
+            <div class="proj-row" id="projRow2">
+              <span class="proj-date">05/10/26</span>
+              <span>₹55,27,290</span>
+              <span>₹48,32,713</span>
+              <span>₹1,17,871</span>
+            </div>
+            <div class="proj-row" id="projRow3">
+              <span class="proj-date">05/03/27</span>
+              <span>₹56,80,866</span>
+              <span>₹49,44,640</span>
+              <span>₹1,20,601</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unit Summary -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🧩 यूनिट सारांश</h2>
+          </div>
+          <div class="unit-summary-grid" id="unitSummaryGrid"></div>
+        </div>
+      </div>
+
+      <!-- Next Meeting -->
+      <div class="card meeting-card">
+        <div class="card-header">
+          <h2 class="card-title">📌 अगली मीटिंग — 05 अक्टूबर 2026</h2>
+        </div>
+        <div class="meeting-grid" id="meetingGrid">
+          <div class="meeting-item">
+            <div class="meeting-label">मंगल दादा</div>
+            <div class="meeting-amount">₹1,08,000</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-label">विनोद</div>
+            <div class="meeting-amount">₹54,063</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-label">नरेन्द्र</div>
+            <div class="meeting-amount">₹54,063</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-label">कमलेश</div>
+            <div class="meeting-amount">₹54,063</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-label">गोविन्द</div>
+            <div class="meeting-amount">₹1,08,188</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-label">अनिल</div>
+            <div class="meeting-amount">₹1,62,188</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-label">कविश</div>
+            <div class="meeting-amount">₹1,85,021</div>
+          </div>
+          <div class="meeting-item total-item">
+            <div class="meeting-label">कुल देय</div>
+            <div class="meeting-amount">₹7,25,584</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Redistribution Schedule -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🔄 वितरण अनुसूची (जुलाई – दिसंबर)</h2>
+        </div>
+        <div class="redist-table" id="redistTable"></div>
+      </div>
+
+    </section>
+
+    <!-- ==================== MEMBERS TAB ==================== -->
+    <section id="tab-members" class="tab-section">
+      <div class="page-header">
+        <h1>👥 सदस्य</h1>
+        <p>We10 BC परिवार फंड के सभी 14 सदस्य। किसी सदस्य पर क्लिक करें तो उनकी ऋण जानकारी देखें।</p>
+      </div>
+      <div class="members-grid" id="membersGrid"></div>
+
+      <!-- Member Detail Modal -->
+      <div class="modal-overlay" id="memberModal">
+        <div class="modal-box">
+          <button class="modal-close" id="modalClose">✕</button>
+          <div id="modalContent"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LOANS TAB ==================== -->
+    <section id="tab-loans" class="tab-section">
+      <div class="page-header">
+        <h1>💰 सक्रिय ऋण एवं गणना</h1>
+        <p>सभी बकाया ऋण — Google Sheet से सीधे लिया गया ब्याज सहित विवरण।</p>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">सभी ऋण</button>
+        <button class="filter-btn" data-filter="apr">अप्रैल 2026</button>
+        <button class="filter-btn" data-filter="may">मई 2026</button>
+        <button class="filter-btn" data-filter="jun">जून 2026</button>
+        <button class="filter-btn" data-filter="jul">जुलाई 2026</button>
+        <button class="filter-btn" data-filter="aug">अगस्त 2026</button>
+        <button class="filter-btn" data-filter="sep">सितंबर 2026</button>
+      </div>
+
+      <div class="loans-table-wrap">
+        <table class="loans-table" id="loansTable">
+          <thead>
+            <tr>
+              <th>तारीख</th>
+              <th>सदस्य</th>
+              <th>मूलधन</th>
+              <th>ब्याज दर</th>
+              <th>आज का मूल्य</th>
+              <th>अक्टूबर '26</th>
+              <th>देय तारीख</th>
+              <th>अंतिम राशि</th>
+            </tr>
+          </thead>
+          <tbody id="loansBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Loan Totals -->
+      <div class="kpi-grid" id="loanTotals" style="margin-top:2rem"></div>
+    </section>
+
+    <!-- ==================== HOW IT WORKS TAB ==================== -->
+    <section id="tab-howit" class="tab-section">
+      <div class="page-header">
+        <h1>📖 We10 BC कैसे काम करता है</h1>
+        <p>हमारी पारिवारिक बचत और उधार प्रणाली की पूरी जानकारी।</p>
+      </div>
+
+      <div class="howit-grid">
+
+        <div class="howit-card">
+          <div class="howit-num">०१</div>
+          <h3>यूनिट और स्वामित्व</h3>
+          <p>फंड को <strong>यूनिट्स</strong> में विभाजित किया गया है। प्रत्येक सदस्य अपनी निवेश क्षमता के आधार पर यूनिट्स रखता है। एक अतिरिक्त यूनिट खरीदने के लिए उस तारीख का <em>प्रति यूनिट मूल्य</em> जमा करना होता है।</p>
+          <ul>
+            <li>कभी भी यूनिट बढ़ाएं या घटाएं</li>
+            <li>उधार सीमा: <strong>₹2,50,000 प्रति यूनिट</strong></li>
+            <li>फंड में कुल यूनिट: <strong>41</strong></li>
+          </ul>
+        </div>
+
+        <div class="howit-card">
+          <div class="howit-num">०२</div>
+          <h3>मासिक बैठक चक्र</h3>
+          <p>हर महीने <strong>5 तारीख</strong> को सभी सदस्य तीन मुख्य कार्यों के लिए मिलते हैं:</p>
+          <ol>
+            <li><strong>मासिक अंशदान</strong> — ₹1,000 प्रति यूनिट प्रति माह</li>
+            <li><strong>ऋण निपटान</strong> — 6 महीने पहले लिए गए ऋण को ब्याज सहित लौटाना</li>
+            <li><strong>पुनर्वितरण</strong> — जुलाई–दिसंबर: निवेशकों को रिटर्न वापस</li>
+            <li><strong>नया उधार</strong> — पूल की शेष राशि नए 6-माही ऋण के रूप में दी जाती है</li>
+          </ol>
+        </div>
+
+        <div class="howit-card">
+          <div class="howit-num">०३</div>
+          <h3>ऋण बोली प्रणाली</h3>
+          <p>जब उधार की मांग उपलब्ध नकदी से अधिक हो, तो सदस्य प्रतिस्पर्धा करते हैं:</p>
+          <ul>
+            <li><strong>नीलामी:</strong> सबसे अधिक ब्याज दर देने वाले को ऋण मिलता है</li>
+            <li><strong>लॉटरी:</strong> समान ब्याज दर होने पर लकी ड्रा</li>
+            <li>सभी ऋण निश्चित <strong>6 महीने</strong> के लिए</li>
+            <li>मासिक बैठक में समय पर भुगतान अनिवार्य</li>
+          </ul>
+        </div>
+
+        <div class="howit-card howit-memorial">
+          <div class="howit-num">🕊️</div>
+          <h3>Nmn-ND स्मारक फंड</h3>
+          <p>हमारे स्वर्गीय परिवार के सदस्य <strong>गोविंद</strong> की स्मृति में उनके बच्चों के लिए एक समर्पित निधि।</p>
+          <ul>
+            <li>मूल राशि: <strong>₹4,10,786</strong></li>
+            <li>वृद्धि: <strong>15% प्रतिवर्ष</strong> चक्रवृद्धि</li>
+            <li>भुगतान लक्ष्य: <strong>वर्ष 2035</strong></li>
+            <li>वर्तमान मूल्य (सितं. 2026): <strong>₹6,87,068</strong></li>
+            <li>अधिकतम रिटर्न के लिए उधार पूल में शामिल</li>
+          </ul>
+        </div>
+
+        <div class="howit-card">
+          <div class="howit-num">०५</div>
+          <h3>यूनिट मूल्यांकन सूत्र</h3>
+          <p>प्रति यूनिट मूल्य इस प्रकार निकाला जाता है:</p>
+          <div class="formula-box">
+            प्रति यूनिट मूल्य = शुद्ध BC पूंजी ÷ कुल यूनिट
+          </div>
+          <p style="margin-top:1rem">जहाँ <em>शुद्ध BC पूंजी</em> = कुल फंड मूल्य − स्मारक फंड हिस्सा</p>
+          <div class="formula-box">
+            ₹47,81,676 ÷ 41 यूनिट = <strong>₹1,16,626</strong>
+          </div>
+        </div>
+
+        <div class="howit-card">
+          <div class="howit-num">०६</div>
+          <h3>XIRR रिटर्न गणना</h3>
+          <p><strong>XIRR</strong> से प्रदर्शन मापा जाता है — अक्टूबर 2020 से अनियमित नकद प्रवाहों को ध्यान में रखकर वार्षिक रिटर्न।</p>
+          <ul>
+            <li>मासिक अंशदान: ₹1,000/यूनिट → ₹1,200/यूनिट (मई 2022 से)</li>
+            <li>वर्तमान XIRR: <strong>17.35% प्रतिवर्ष</strong></li>
+            <li>लागत आधार प्रति यूनिट: <strong>₹64,235</strong></li>
+            <li>वर्तमान मूल्य प्रति यूनिट: <strong>₹1,16,626</strong></li>
+            <li>प्रति यूनिट लाभ: <strong>+₹52,391 (+81.6%)</strong></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Timeline -->
+      <div class="card" style="margin-top:2rem">
+        <div class="card-header">
+          <h2 class="card-title">📆 फंड समयरेखा</h2>
+        </div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <strong>अक्टूबर 2020</strong> — फंड की शुरुआत ₹1,000/यूनिट/माह से
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <strong>मई 2022</strong> — मासिक अंशदान बढ़कर ₹1,200/यूनिट
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <strong>नवंबर 2022</strong> — Nmn-ND स्मारक फंड स्थापित (₹4,10,786)
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <strong>मार्च 2026</strong> — पुनर्वितरण चक्र (₹41,000 निवेशकों को वापस)
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot amber"></div>
+            <div class="tl-content">
+              <strong>सितंबर 2026</strong> — वर्तमान: कुल ₹54,68,744 · XIRR 17.35%
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot gray"></div>
+            <div class="tl-content">
+              <strong>2035 (लक्ष्य)</strong> — गोविंद के बच्चों को Nmn-ND फंड का भुगतान
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== RULES TAB ==================== -->
+    <section id="tab-rules" class="tab-section">
+      <div class="page-header">
+        <h1>📜 BC के नियम</h1>
+        <p>We10 BC परिवार फंड के संचालन हेतु सभी सदस्यों द्वारा सहमत नियम एवं शर्तें।</p>
+      </div>
+
+      <div class="rules-grid">
+
+        <div class="rule-card">
+          <div class="rule-num">१</div>
+          <div class="rule-body">
+            <h3>नई यूनिट जोड़ना</h3>
+            <p>नई यूनिट जोड़ने के लिए उस दिन तक की <strong>भविष्य मूल्य (Future Value)</strong> + <strong>प्रति माह की किश्त</strong> की राशि देनी होगी।</p>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">२</div>
+          <div class="rule-body">
+            <h3>₹50,000 से कम की शेष राशि</h3>
+            <p>अंतिम बचे हुए <strong>₹50,000 से कम</strong> धनराशि के लिए वे सभी सदस्य योग्य होंगे, जिनकी लिमिट मीटिंग की शुरुआत में खुली हो या पूर्ण न हुई हो।</p>
+          </div>
+        </div>
+
+        <div class="rule-card rule-card-wide">
+          <div class="rule-num">३</div>
+          <div class="rule-body">
+            <h3>Exit के नियम</h3>
+            <div class="sub-rules">
+              <div class="sub-rule"><span class="sub-label">क</span><p>मीटिंग शुरू होने से पहले सूचना देनी होगी (WhatsApp पर दे सकते हैं)।</p></div>
+              <div class="sub-rule"><span class="sub-label">ख</span><p>उस मीटिंग की किश्त नहीं ली जाएगी।</p></div>
+              <div class="sub-rule"><span class="sub-label">ग</span><p>देय धनराशि अगली मीटिंग में दी जाएगी।</p></div>
+              <div class="sub-rule"><span class="sub-label">घ</span><p>यदि अगली मीटिंग में देय धनराशि का पूरा भुगतान न हो पाए, तो शेष धनराशि उसकी अगली मीटिंग में <strong>1% ब्याज</strong> जोड़कर दी जाएगी।</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">४</div>
+          <div class="rule-body">
+            <h3>नए निवेश निर्णय</h3>
+            <p>किसी भी नए निवेश संबंधी निर्णय पर, <strong>दो माह बाद</strong> वाली मीटिंग में सभी को अपनी देय धनराशि जमा करवानी होगी।</p>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">५</div>
+          <div class="rule-body">
+            <h3>न्यूनतम ब्याज दर</h3>
+            <p>न्यूनतम ब्याज दर <strong>8% प्रतिवर्ष</strong> रहेगी।</p>
+            <div class="rule-highlight">8% p.a. न्यूनतम</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">६</div>
+          <div class="rule-body">
+            <h3>Rollover नियम</h3>
+            <p>यदि कोई सदस्य उधार ली गई धनराशि को 6 माह बाद <strong>Rollover</strong> करना चाहता है, तो उसे स्वयं मीटिंग में <strong>उपस्थित होना अनिवार्य</strong> होगा। अनुपस्थिति में Rollover नहीं किया जाएगा।</p>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">७</div>
+          <div class="rule-body">
+            <h3>मीटिंग का आयोजन</h3>
+            <p>हर मीटिंग <strong>बारी-बारी से</strong> सभी सदस्यों के यहाँ आयोजित की जाएगी। उस मीटिंग में डायरी से लेकर सभी सदस्यों से संवाद करने की जिम्मेदारी <strong>उसी आयोजक</strong> की होगी।</p>
+          </div>
+        </div>
+
+        <div class="rule-card rule-card-alert">
+          <div class="rule-num">८</div>
+          <div class="rule-body">
+            <h3>देरी पर पेनल्टी</h3>
+            <p>यदि कोई सदस्य मीटिंग वाले दिन अपनी देय धनराशि नहीं पहुँचा पाएगा, तो उसे अगले दिन से <strong>0.1% प्रतिदिन</strong> की दर से पेनल्टी जोड़कर वह राशि उस मीटिंग के आयोजक को देनी होगी।</p>
+            <div class="rule-highlight rule-highlight-red">0.1% / दिन पेनल्टी</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">९</div>
+          <div class="rule-body">
+            <h3>बोली लगाने के नियम</h3>
+            <p>बोली सिर्फ <strong>भौतिक रूप से उपस्थित</strong> सदस्य ही लगाएंगे। यदि कोई सदस्य अनुपस्थित है और बोली लगाना चाहता है, तो उसे उपस्थित सदस्यों में से किसी एक को <strong>प्रतिनिधि</strong> चुनकर उसके माध्यम से बोली लगवानी होगी।</p>
+            <p style="margin-top:0.5rem;font-size:0.82rem;color:var(--text-dim)">(प्रतिनिधि की सूचना मीटिंग से पूर्व WhatsApp पर देनी होगी।)</p>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">१०</div>
+          <div class="rule-body">
+            <h3>मीटिंग का समय</h3>
+            <p>मीटिंग आयोजक के घर पर <strong>8:30 बजे</strong> शुरू होगी।</p>
+            <div class="time-line">
+              <div class="time-step"><span class="time-badge">8:30</span><span>मीटिंग शुरू</span></div>
+              <div class="time-arrow">→</div>
+              <div class="time-step"><span class="time-badge">9:00</span><span>धनराशि संग्रह</span></div>
+              <div class="time-arrow">→</div>
+              <div class="time-step"><span class="time-badge">9:00–9:30</span><span>बोली प्रक्रिया</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-num">११</div>
+          <div class="rule-body">
+            <h3>संचार केवल WhatsApp पर</h3>
+            <p>मीटिंग की जानकारी के लिए <strong>किसी को कॉल नहीं किया जाएगा</strong>। सभी सूचनाएँ WhatsApp पर दी जाएँगी। मीटिंग के प्रति जो भी आपकी व्यक्तिगत जिम्मेदारी है, उसे <strong>स्वयं आगे बढ़कर पूरा करें।</strong></p>
+          </div>
+        </div>
+
+        <div class="rule-card rule-card-highlight">
+          <div class="rule-num">१२</div>
+          <div class="rule-body">
+            <h3>उधार सीमा (Limit)</h3>
+            <p>लिमिट को प्रति यूनिट <strong>₹2,50,000</strong> तक बढ़ाया जाता है। यह कुल जमा राशि के लगभग <strong>तीन गुणा</strong> के अनुपात में निर्धारित की जाती है।</p>
+            <div class="rule-highlight">₹2,50,000 प्रति यूनिट</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">We10 BC परिवार फंड</div>
+      <div class="footer-meta">
+        <span>14 सदस्य · 41 यूनिट</span>
+        <span>•</span>
+        <span>स्थापना: अक्टूबर 2020</span>
+        <span>•</span>
+        <span id="footerLastSync">अंतिम अपडेट: —</span>
+      </div>
+      <div class="footer-disclaimer">यह एक निजी पारिवारिक बचत समूह है। डेटा केवल आंतरिक पारदर्शिता के लिए है।</div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
