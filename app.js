@@ -6,7 +6,9 @@
 // GOOGLE SHEETS CONFIG
 // ─────────────────────────────────────────────
 const SHEET_ID   = '1IUkCSOrmczIGYmYcTLgnrBK1cS9kH6CEkO-hKXR6kec';
-const SHEET_BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=`;
+// Use gviz/tq with out:json — this endpoint sends correct CORS headers for live deployments.
+// The CSV endpoint (?tqx=out:csv) is blocked by browsers when the page is hosted online.
+const SHEET_BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=`;
 const CACHE_KEY  = 'we10bc_cache';
 const CACHE_TTL  = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
 
@@ -159,8 +161,7 @@ function cleanNum(s) {
 // ─────────────────────────────────────────────
 
 // ── "We10 BC" sheet  → summary KPIs + member units
-function parseMainSheet(csv) {
-  const rows = parseCSV(csv);
+function parseMainSheet(rows) {
   const memberColors = {
     'विनोद':'#3b82f6','कविश':'#a855f7','समरथ':'#22c55e','कमलेश':'#f59e0b',
     'गोविन्द':'#ef4444','अनिल':'#06b6d4','राहुल':'#84cc16','अभिषेक':'#f97316',
@@ -236,8 +237,7 @@ function parseMainSheet(csv) {
 }
 
 // ── "Calculation" sheet  → loans (skip NMN-ND rows 8–19 i.e. rows up to index ~17)
-function parseCalculationSheet(csv) {
-  const rows = parseCSV(csv);
+function parseCalculationSheet(rows) {
   const loans = [];
 
   // The NMN-ND rows are the ones from ~index 5 to 16 (0-based after header rows)
@@ -284,8 +284,7 @@ function parseCalculationSheet(csv) {
 }
 
 // ── "Redistribution" sheet
-function parseRedistSheet(csv) {
-  const rows = parseCSV(csv);
+function parseRedistSheet(rows) {
   const result = [];
   const monthMap = {
     'july':'जुलाई','aug':'अगस्त','sept':'सितंबर','sep':'सितंबर',
@@ -308,11 +307,47 @@ function parseRedistSheet(csv) {
 // ─────────────────────────────────────────────
 // FETCH FROM GOOGLE SHEETS
 // ─────────────────────────────────────────────
+
+// The gviz/tq JSON response is wrapped in a JS callback:
+//   /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+// We strip that wrapper and parse the JSON inside.
+function parseGvizJSON(raw) {
+  // Strip the JSONP wrapper Google adds
+  const start = raw.indexOf('{');
+  const end   = raw.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('Invalid gviz response');
+  const json = JSON.parse(raw.slice(start, end + 1));
+
+  // Convert gviz table format → 2D array of strings (same shape as CSV rows)
+  const cols = json.table?.cols || [];
+  const rows = json.table?.rows || [];
+  return rows.map(row =>
+    (row.c || []).map((cell, i) => {
+      if (!cell || cell.v === null || cell.v === undefined) return '';
+      // Dates come as Date(year,month,day) objects — convert to DD/MM/YYYY string
+      const type = cols[i]?.type;
+      if (type === 'date' && typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
+        const m = cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
+        if (m) {
+          const d = String(m[3]).padStart(2,'0');
+          const mo = String(Number(m[2])+1).padStart(2,'0');
+          const yr = m[1].slice(-2); // last 2 digits
+          return `${d}/${mo}/${yr}`;
+        }
+      }
+      // formatted value (f) is human-readable; raw value (v) is the number
+      return cell.f !== undefined && cell.f !== null ? String(cell.f) : String(cell.v);
+    })
+  );
+}
+
 async function fetchSheet(sheetName) {
   const url = SHEET_BASE + encodeURIComponent(sheetName);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Sheet "${sheetName}" fetch failed: ${res.status}`);
-  return res.text();
+  const text = await res.text();
+  // Return parsed rows (2D string array), same interface the parsers expect
+  return parseGvizJSON(text);
 }
 
 async function syncFromSheet(force = false) {
@@ -344,15 +379,15 @@ async function syncFromSheet(force = false) {
   setSyncing(true);
 
   try {
-    const [mainCSV, calcCSV, redistCSV] = await Promise.all([
+    const [mainRows, calcRows, redistRows] = await Promise.all([
       fetchSheet('We10 BC'),
       fetchSheet('Calculation'),
       fetchSheet('Redistribution'),
     ]);
 
-    const { summary, members } = parseMainSheet(mainCSV);
-    const loans  = parseCalculationSheet(calcCSV);
-    const redist = parseRedistSheet(redistCSV);
+    const { summary, members } = parseMainSheet(mainRows);
+    const loans  = parseCalculationSheet(calcRows);
+    const redist = parseRedistSheet(redistRows);
 
     DATA = { summary, members, loans, redist, source:'live', syncedAt: Date.now() };
     saveCache(DATA);
