@@ -10,7 +10,7 @@ const SHEET_ID   = '1IUkCSOrmczIGYmYcTLgnrBK1cS9kH6CEkO-hKXR6kec';
 // The CSV endpoint (?tqx=out:csv) is blocked by browsers when the page is hosted online.
 const SHEET_BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=`;
 const CACHE_KEY  = 'we10bc_cache';
-const CACHE_TTL  = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
+const CACHE_TTL  = 6 * 60 * 60 * 1000; // 6 hours — sheet updates should reflect same day
 
 // When opening via file://, fetch will be blocked by the browser.
 // Detect this and show a helpful message instead of silently failing.
@@ -21,17 +21,17 @@ const IS_FILE_PROTOCOL = location.protocol === 'file:';
 // ─────────────────────────────────────────────
 
 const FALLBACK_SUMMARY = {
-  grossValue : 5468744,
-  memorial   : 687068,
-  netBC      : 4781676,
-  perUnit    : 116626,
-  costBasis  : 64235,
-  xirr       : '17.35%',
-  asOf       : '07/09/2026',
+  grossValue : 5396888,
+  memorial   : 695927,
+  netBC      : 4700961,
+  perUnit    : 114658,
+  costBasis  : 60807,
+  xirr       : '17.29%',
+  asOf       : '10/10/2026',
   proj: [
-    { date:'07/09/26', label:'आज',     gross:5468744, net:4781676, perUnit:116626 },
-    { date:'05/10/26', label:'',        gross:5527290, net:4832713, perUnit:117871 },
-    { date:'05/03/27', label:'',        gross:5680866, net:4944640, perUnit:120601 },
+    { date:'10/10/26', label:'आज',     gross:5396888, net:4700961, perUnit:114658 },
+    { date:'05/11/26', label:'',        gross:5447701, net:4744987, perUnit:115731 },
+    { date:'05/04/27', label:'',        gross:5584177, net:4839326, perUnit:118032 },
   ],
 };
 
@@ -58,53 +58,47 @@ const FALLBACK_MEMBERS = [
 // They are excluded from the loans section entirely.
 
 const FALLBACK_LOANS = [
-  // ── अप्रैल 2026
-  { date:'5/4/26',  hi:'मंगल दादा', principal:100000, rate:16,    today:106756, oct26:108000, dueDate:'5/10/26', final:108000, month:'apr' },
-  { date:'5/4/26',  hi:'विनोद',     principal:50000,  rate:16.25, today:53431,  oct26:54063,  dueDate:'5/10/26', final:54063,  month:'apr' },
-  { date:'5/4/26',  hi:'नरेन्द्र',  principal:50000,  rate:16.25, today:53431,  oct26:54063,  dueDate:'5/10/26', final:54063,  month:'apr' },
-  { date:'5/4/26',  hi:'कमलेश',     principal:50000,  rate:16.25, today:53431,  oct26:54063,  dueDate:'5/10/26', final:54063,  month:'apr' },
-  { date:'5/4/26',  hi:'गोविन्द',   principal:50000,  rate:16.25, today:53431,  oct26:54063,  dueDate:'5/10/26', final:54063,  month:'apr' },
-  { date:'5/4/26',  hi:'गोविन्द',   principal:50000,  rate:16.5,  today:53483,  oct26:54125,  dueDate:'5/10/26', final:54125,  month:'apr' },
-  { date:'5/4/26',  hi:'अनिल',      principal:50000,  rate:16.25, today:53431,  oct26:54063,  dueDate:'5/10/26', final:54063,  month:'apr' },
-  { date:'5/4/26',  hi:'अनिल',      principal:50000,  rate:16.5,  today:53483,  oct26:54125,  dueDate:'5/10/26', final:54125,  month:'apr' },
-  { date:'5/4/26',  hi:'अनिल',      principal:50000,  rate:16,    today:53378,  oct26:54000,  dueDate:'5/10/26', final:54000,  month:'apr' },
-  { date:'5/4/26',  hi:'कविश',      principal:50000,  rate:16.5,  today:53483,  oct26:54125,  dueDate:'5/10/26', final:54125,  month:'apr' },
-  { date:'5/4/26',  hi:'कविश',      principal:100000, rate:16,    today:106756, oct26:108000, dueDate:'5/10/26', final:108000, month:'apr' },
-  { date:'5/4/26',  hi:'कविश',      principal:21200,  rate:16,    today:22632,  oct26:22896,  dueDate:'5/10/26', final:22896,  month:'apr' },
   // ── मई 2026
-  { date:'5/5/26',  hi:'कविश',      principal:550000, rate:15,    today:577958, oct26:584375, dueDate:'5/11/26', final:591250, month:'may' },
-  { date:'5/5/26',  hi:'विनोद',     principal:100000, rate:15,    today:105083, oct26:106250, dueDate:'5/11/26', final:107500, month:'may' },
-  { date:'5/5/26',  hi:'गोविन्द',   principal:250000, rate:15,    today:262708, oct26:265625, dueDate:'5/11/26', final:268750, month:'may' },
-  { date:'5/5/26',  hi:'राहुल',     principal:100000, rate:15,    today:105083, oct26:106250, dueDate:'5/11/26', final:107500, month:'may' },
-  { date:'5/5/26',  hi:'विनोद',     principal:17615,  rate:15,    today:18510,  oct26:18716,  dueDate:'5/11/26', final:18936,  month:'may' },
+  { date:'5/5/26',  hi:'कविश',      principal:550000, rate:15,    today:585521, oct26:591250, dueDate:'5/11/26', final:591250, month:'may' },
+  { date:'5/5/26',  hi:'विनोद',     principal:100000, rate:15,    today:106458, oct26:107500, dueDate:'5/11/26', final:107500, month:'may' },
+  { date:'5/5/26',  hi:'गोविन्द',   principal:250000, rate:15,    today:266146, oct26:268750, dueDate:'5/11/26', final:268750, month:'may' },
+  { date:'5/5/26',  hi:'राहुल',     principal:100000, rate:15,    today:106458, oct26:107500, dueDate:'5/11/26', final:107500, month:'may' },
+  { date:'5/5/26',  hi:'विनोद',     principal:17615,  rate:15,    today:18753,  oct26:18936,  dueDate:'5/11/26', final:18936,  month:'may' },
   // ── जून 2026
-  { date:'5/6/26',  hi:'नरेन्द्र',  principal:200000, rate:15,    today:207667, oct26:210000, dueDate:'5/12/26', final:215000, month:'jun' },
-  { date:'5/6/26',  hi:'विनोद',     principal:50000,  rate:15,    today:51917,  oct26:52500,  dueDate:'5/12/26', final:53750,  month:'jun' },
-  { date:'5/6/26',  hi:'कमलेश',     principal:50000,  rate:15,    today:51917,  oct26:52500,  dueDate:'5/12/26', final:53750,  month:'jun' },
-  { date:'5/6/26',  hi:'कविश',      principal:700000, rate:15,    today:726833, oct26:735000, dueDate:'5/12/26', final:752500, month:'jun' },
-  { date:'5/6/26',  hi:'कविश',      principal:25381,  rate:15,    today:26354,  oct26:26650,  dueDate:'5/12/26', final:27285,  month:'jun' },
+  { date:'5/6/26',  hi:'नरेन्द्र',  principal:200000, rate:15,    today:210417, oct26:212500, dueDate:'5/12/26', final:215000, month:'jun' },
+  { date:'5/6/26',  hi:'विनोद',     principal:50000,  rate:15,    today:52604,  oct26:53125,  dueDate:'5/12/26', final:53750,  month:'jun' },
+  { date:'5/6/26',  hi:'कमलेश',     principal:50000,  rate:15,    today:52604,  oct26:53125,  dueDate:'5/12/26', final:53750,  month:'jun' },
+  { date:'5/6/26',  hi:'कविश',      principal:700000, rate:15,    today:736458, oct26:743750, dueDate:'5/12/26', final:752500, month:'jun' },
+  { date:'5/6/26',  hi:'कविश',      principal:25381,  rate:15,    today:26703,  oct26:26967,  dueDate:'5/12/26', final:27285,  month:'jun' },
   // ── जुलाई 2026
-  { date:'5/7/26',  hi:'अभिषेक',    principal:100000, rate:13,    today:102239, oct26:103250, dueDate:'5/1/27',  final:106500, month:'jul' },
-  { date:'5/7/26',  hi:'कविश',      principal:673553, rate:13,    today:688633, oct26:695443, dueDate:'5/1/27',  final:717334, month:'jul' },
+  { date:'5/7/26',  hi:'अभिषेक',    principal:100000, rate:13,    today:103431, oct26:104333, dueDate:'5/1/27',  final:106500, month:'jul' },
+  { date:'5/7/26',  hi:'कविश',      principal:650000, rate:13,    today:672299, oct26:678167, dueDate:'5/1/27',  final:692250, month:'jul' },
   // ── अगस्त 2026
-  { date:'5/8/26',  hi:'राहुल',     principal:250000, rate:12.5,  today:252778, oct26:255208, dueDate:'5/2/27',  final:265625, month:'aug' },
-  { date:'5/8/26',  hi:'कविश',      principal:250000, rate:12.5,  today:252778, oct26:255208, dueDate:'5/2/27',  final:265625, month:'aug' },
-  { date:'5/8/26',  hi:'अनिल',      principal:150000, rate:12.5,  today:151667, oct26:153125, dueDate:'5/2/27',  final:159375, month:'aug' },
-  { date:'5/8/26',  hi:'नरेन्द्र',  principal:150000, rate:12.5,  today:151667, oct26:153125, dueDate:'5/2/27',  final:159375, month:'aug' },
-  { date:'5/8/26',  hi:'कविश',      principal:30491,  rate:12.5,  today:30830,  oct26:31126,  dueDate:'5/2/27',  final:32397,  month:'aug' },
+  { date:'5/8/26',  hi:'राहुल',     principal:250000, rate:12.5,  today:255642, oct26:257813, dueDate:'5/2/27',  final:265625, month:'aug' },
+  { date:'5/8/26',  hi:'कविश',      principal:250000, rate:12.5,  today:255642, oct26:257813, dueDate:'5/2/27',  final:265625, month:'aug' },
+  { date:'5/8/26',  hi:'अनिल',      principal:150000, rate:12.5,  today:153385, oct26:154688, dueDate:'5/2/27',  final:159375, month:'aug' },
+  { date:'5/8/26',  hi:'नरेन्द्र',  principal:150000, rate:12.5,  today:153385, oct26:154688, dueDate:'5/2/27',  final:159375, month:'aug' },
+  { date:'5/8/26',  hi:'कविश',      principal:30491,  rate:12.5,  today:31179,  oct26:31444,  dueDate:'5/2/27',  final:32397,  month:'aug' },
   // ── सितंबर 2026
-  { date:'5/9/26',  hi:'गोविन्द',   principal:150000, rate:13.5,  today:150113, oct26:151688, dueDate:'5/3/27',  final:160125, month:'sep' },
-  { date:'5/9/26',  hi:'विनोद',     principal:50000,  rate:13.5,  today:50038,  oct26:50563,  dueDate:'5/3/27',  final:53375,  month:'sep' },
-  { date:'5/9/26',  hi:'राहुल',     principal:150000, rate:13.5,  today:150113, oct26:151688, dueDate:'5/3/27',  final:160125, month:'sep' },
-  { date:'5/9/26',  hi:'अभिषेक',    principal:50000,  rate:13.5,  today:50038,  oct26:50563,  dueDate:'5/3/27',  final:53375,  month:'sep' },
-  { date:'5/9/26',  hi:'अभिषेक',    principal:100000, rate:13.5,  today:100075, oct26:101125, dueDate:'5/3/27',  final:106750, month:'sep' },
-  { date:'5/9/26',  hi:'कमलेश',     principal:100000, rate:13.5,  today:100075, oct26:101125, dueDate:'5/3/27',  final:106750, month:'sep' },
-  { date:'5/9/26',  hi:'अनिल',      principal:50000,  rate:13.5,  today:50038,  oct26:50563,  dueDate:'5/3/27',  final:53375,  month:'sep' },
-  { date:'5/9/26',  hi:'समरथ',      principal:50000,  rate:13.5,  today:50038,  oct26:50563,  dueDate:'5/3/27',  final:53375,  month:'sep' },
-  { date:'5/9/26',  hi:'कविश',      principal:100000, rate:13.5,  today:100075, oct26:101125, dueDate:'5/3/27',  final:106750, month:'sep' },
-  { date:'5/9/26',  hi:'कविश',      principal:100000, rate:13.5,  today:100075, oct26:101125, dueDate:'5/3/27',  final:106750, month:'sep' },
-  { date:'5/9/26',  hi:'कविश',      principal:50000,  rate:13.5,  today:50038,  oct26:50563,  dueDate:'5/3/27',  final:53375,  month:'sep' },
-  { date:'5/9/26',  hi:'विनोद',     principal:36259,  rate:13.5,  today:36286,  oct26:36667,  dueDate:'5/3/27',  final:38706,  month:'sep' },
+  { date:'5/9/26',  hi:'गोविन्द',   principal:150000, rate:13.5,  today:151969, oct26:153375, dueDate:'5/3/27',  final:160125, month:'sep' },
+  { date:'5/9/26',  hi:'विनोद',     principal:50000,  rate:13.5,  today:50656,  oct26:51125,  dueDate:'5/3/27',  final:53375,  month:'sep' },
+  { date:'5/9/26',  hi:'राहुल',     principal:150000, rate:13.5,  today:151969, oct26:153375, dueDate:'5/3/27',  final:160125, month:'sep' },
+  { date:'5/9/26',  hi:'अभिषेक',    principal:50000,  rate:13.5,  today:50656,  oct26:51125,  dueDate:'5/3/27',  final:53375,  month:'sep' },
+  { date:'5/9/26',  hi:'अभिषेक',    principal:100000, rate:13.5,  today:101313, oct26:102250, dueDate:'5/3/27',  final:106750, month:'sep' },
+  { date:'5/9/26',  hi:'कमलेश',     principal:100000, rate:13.5,  today:101313, oct26:102250, dueDate:'5/3/27',  final:106750, month:'sep' },
+  { date:'5/9/26',  hi:'अनिल',      principal:50000,  rate:13.5,  today:50656,  oct26:51125,  dueDate:'5/3/27',  final:53375,  month:'sep' },
+  { date:'5/9/26',  hi:'समरथ',      principal:50000,  rate:13.5,  today:50656,  oct26:51125,  dueDate:'5/3/27',  final:53375,  month:'sep' },
+  { date:'5/9/26',  hi:'कविश',      principal:100000, rate:13.5,  today:101313, oct26:102250, dueDate:'5/3/27',  final:106750, month:'sep' },
+  { date:'5/9/26',  hi:'कविश',      principal:100000, rate:13.5,  today:101313, oct26:102250, dueDate:'5/3/27',  final:106750, month:'sep' },
+  { date:'5/9/26',  hi:'कविश',      principal:50000,  rate:13.5,  today:50656,  oct26:51125,  dueDate:'5/3/27',  final:53375,  month:'sep' },
+  { date:'5/9/26',  hi:'विनोद',     principal:36259,  rate:13.5,  today:36735,  oct26:37075,  dueDate:'5/3/27',  final:38706,  month:'sep' },
+  // ── अक्टूबर 2026
+  { date:'5/10/26', hi:'अनिल',      principal:150000, rate:15,    today:150313, oct26:151875, dueDate:'5/4/27',  final:161250, month:'oct' },
+  { date:'5/10/26', hi:'गोविन्द',   principal:100000, rate:15,    today:100208, oct26:101250, dueDate:'5/4/27',  final:107500, month:'oct' },
+  { date:'5/10/26', hi:'कविश',      principal:200000, rate:15,    today:200417, oct26:202500, dueDate:'5/4/27',  final:215000, month:'oct' },
+  { date:'5/10/26', hi:'कमलेश',     principal:50000,  rate:15,    today:50104,  oct26:50625,  dueDate:'5/4/27',  final:53750,  month:'oct' },
+  { date:'5/10/26', hi:'विनोद',     principal:50000,  rate:15,    today:50104,  oct26:50625,  dueDate:'5/4/27',  final:53750,  month:'oct' },
+  { date:'5/10/26', hi:'विनोद',     principal:35018,  rate:15,    today:35091,  oct26:35456,  dueDate:'5/4/27',  final:37644,  month:'oct' },
 ];
 
 const FALLBACK_REDIST = [
@@ -183,12 +177,25 @@ function parseMainSheet(rows) {
   const members = [];
   let summary = null;
   let xirr = '17.35%', costBasis = 64235;
+  const projRows = [];
 
   for (const row of rows) {
     const name = row[0]?.trim();
-    if (!name) continue;
+    if (!name) {
+      // Blank col A — could be XIRR or cost basis row
+      // col[2] holds the value for these rows
+      const val2 = row[2]?.replace(/[₹,\s]/g, '') || '';
+      const pct = parseFloat(val2);
+      if (val2.includes('%') || (pct > 5 && pct < 50 && val2.includes('.'))) {
+        xirr = pct.toFixed(2) + '%';
+      } else {
+        const cb = parseFloat(val2);
+        if (cb > 50000 && cb < 100000) costBasis = cb;
+      }
+      continue;
+    }
 
-    // Member row: col1 = units, col2 = limit
+    // Member row: col[1] = units (number > 0), col[0] = Hindi name in lookup
     const units = parseInt(row[1]);
     if (!isNaN(units) && units > 0 && memberColors[name]) {
       members.push({
@@ -201,26 +208,33 @@ function parseMainSheet(rows) {
       });
     }
 
-    // Date rows for projections (format DD/MM/YYYY)
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(name)) {
-      const gross   = cleanNum(row[2]);
-      const memorial= cleanNum(row[3]);
-      const net     = cleanNum(row[4]);
-      const perUnit = cleanNum(row[5]);
-      if (!summary) {
-        summary = { grossValue:gross, memorial, netBC:net, perUnit, asOf:name };
+    // Projection rows: col[0] is a date string (DD/MM/YYYY or D/M/YYYY),
+    // col[1] is null, cols[2..5] = gross, memorial, net, perUnit
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(name)) {
+      const gross    = cleanNum(row[2]);
+      const memorial = cleanNum(row[3]);
+      const net      = cleanNum(row[4]);
+      const perUnit  = cleanNum(row[5]);
+      if (gross > 0) {
+        projRows.push({ date: name, gross, memorial, net, perUnit });
+        if (!summary) {
+          // Format date as DD/MM/YY for display
+          const parts = name.split('/');
+          const shortDate = `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].slice(-2)}`;
+          summary = { grossValue: gross, memorial, netBC: net, perUnit, asOf: shortDate };
+        }
       }
     }
 
-    // XIRR row
-    if (row[2] && row[2].includes('%') && !name.includes('/')) {
-      const v = parseFloat(row[2]);
+    // XIRR row (col[2] is a percentage string like "17.29%")
+    if (row[2] && String(row[2]).includes('%') && !name.includes('/')) {
+      const v = parseFloat(String(row[2]));
       if (!isNaN(v) && v > 5 && v < 50) xirr = v.toFixed(2) + '%';
     }
-    // Cost basis row
-    if (cleanNum(row[2]) > 50000 && cleanNum(row[2]) < 100000 && !name.includes('/')) {
+    // Cost basis row (col[2] is a plain number in range 50k–100k)
+    if (!row[2]?.includes('%') && !name.includes('/')) {
       const cb = cleanNum(row[2]);
-      if (cb > 0) costBasis = cb;
+      if (cb > 50000 && cb < 100000) costBasis = cb;
     }
   }
 
@@ -228,9 +242,17 @@ function parseMainSheet(rows) {
   summary.xirr = xirr;
   summary.costBasis = costBasis;
 
-  // Build projection rows from parsed data
-  if (summary.grossValue) {
-    summary.proj = FALLBACK_SUMMARY.proj; // keep projections from fallback unless we parse them
+  // Build projection display rows from parsed data (up to 3)
+  if (projRows.length >= 1) {
+    summary.proj = projRows.slice(0, 3).map((p, i) => ({
+      date    : (() => { const pts = p.date.split('/'); return `${pts[0].padStart(2,'0')}/${pts[1].padStart(2,'0')}/${pts[2].slice(-2)}`; })(),
+      label   : i === 0 ? 'आज' : '',
+      gross   : p.gross,
+      net     : p.net,
+      perUnit : p.perUnit,
+    }));
+  } else {
+    summary.proj = FALLBACK_SUMMARY.proj;
   }
 
   return { summary, members: members.length > 0 ? members : FALLBACK_MEMBERS };
@@ -240,21 +262,22 @@ function parseMainSheet(rows) {
 function parseCalculationSheet(rows) {
   const loans = [];
 
-  // The NMN-ND rows are the ones from ~index 5 to 16 (0-based after header rows)
-  // We identify them by date being 2022 or 2023 — these are memorial fund contributions, not loans.
-  // Per user's instruction: rows 8–19 in the sheet = NMN-ND contributions to skip.
-
-  // Month classifier
+  // Month classifier — identifies active BC loans by their disbursement date.
+  // Anything with year 2022 or 2023 is a NMN-ND memorial fund contribution → skip.
   function classifyMonth(dateStr) {
     if (!dateStr) return null;
     const s = dateStr.toLowerCase();
-    if (s.includes('4/26') || s.includes('4/2026')) return 'apr';
-    if (s.includes('5/26') || s.includes('5/2026')) return 'may';
-    if (s.includes('6/26') || s.includes('6/2026')) return 'jun';
-    if (s.includes('7/26') || s.includes('7/2026')) return 'jul';
-    if (s.includes('8/26') || s.includes('8/2026')) return 'aug';
-    if (s.includes('9/26') || s.includes('9/2026')) return 'sep';
-    return null; // anything else (2022, 2023) is NMN-ND or old — skip
+    // Match d/m/yy or d/m/yyyy patterns
+    if (/\/4\/26$/.test(s) || s.includes('4/2026')) return 'apr';
+    if (/\/5\/26$/.test(s) || s.includes('5/2026')) return 'may';
+    if (/\/6\/26$/.test(s) || s.includes('6/2026')) return 'jun';
+    if (/\/7\/26$/.test(s) || s.includes('7/2026')) return 'jul';
+    if (/\/8\/26$/.test(s) || s.includes('8/2026')) return 'aug';
+    if (/\/9\/26$/.test(s) || s.includes('9/2026')) return 'sep';
+    if (/\/10\/26$/.test(s) || s.includes('10/2026')) return 'oct';
+    if (/\/11\/26$/.test(s) || s.includes('11/2026')) return 'nov';
+    if (/\/12\/26$/.test(s) || s.includes('12/2026')) return 'dec';
+    return null; // 2022, 2023 rows → NMN-ND, skip
   }
 
   for (const row of rows) {
@@ -263,21 +286,29 @@ function parseCalculationSheet(rows) {
     const princ   = cleanNum(row[2]);
     const rateStr = row[3]?.trim();
     const todayV  = cleanNum(row[4]);
-    const oct26V  = cleanNum(row[5]);
+    const nextV   = cleanNum(row[5]);  // value at next meeting date
     const dueDate = row[6]?.trim();
     const finalV  = cleanNum(row[7]);
 
     if (!dateStr || !name || princ === 0) continue;
-
-    // Skip header rows, total rows, blank rows
-    if (dateStr === 'Date' || name === '' || name === 'Total BC') continue;
+    if (dateStr === 'Date' || name === 'Total BC') continue;
 
     const month = classifyMonth(dateStr);
-    if (!month) continue; // skip NMN-ND (2022/2023) rows entirely
+    if (!month) continue; // skip NMN-ND (2022/2023) rows
 
     const rate = parseFloat((rateStr || '').replace('%', '')) || 0;
 
-    loans.push({ date:dateStr, hi:name, principal:princ, rate, today:todayV, oct26:oct26V, dueDate:dueDate || '—', final:finalV, month });
+    loans.push({
+      date    : dateStr,
+      hi      : name,
+      principal: princ,
+      rate,
+      today   : todayV,
+      oct26   : nextV,   // "next meeting" column — label in table is dynamic
+      dueDate : dueDate || '—',
+      final   : finalV,
+      month,
+    });
   }
 
   return loans.length > 0 ? loans : FALLBACK_LOANS;
@@ -562,16 +593,37 @@ function remainingLimit(member) {
 }
 
 // Remaining limit after the upcoming meeting:
-// When a member repays the Oct-due loans, their limit is freed up by that amount,
-// then the monthly contribution is also credited. We approximate by finding
-// loans due at the next meeting (5/10/26) and freeing those principals.
+// Find the earliest due date across all active loans — that's the next meeting.
+// Loans repaid at that meeting free up their principal in the limit.
 function remainingLimitAfterMeeting(member) {
   const loans = memberLoans(member.id);
-  // Loans due at next meeting (October 2026) with principal ≥ 50k
+
+  // Find the nearest due date from all active loans (across all members)
+  const allDueDates = DATA.loans
+    .map(l => l.dueDate)
+    .filter(d => d && d !== '—')
+    .map(d => {
+      // Parse D/M/YY or D/M/YYYY
+      const parts = d.split('/');
+      if (parts.length !== 3) return null;
+      const year = parts[2].length === 2 ? 2000 + parseInt(parts[2]) : parseInt(parts[2]);
+      return new Date(year, parseInt(parts[1]) - 1, parseInt(parts[0]));
+    })
+    .filter(d => d && !isNaN(d));
+
+  const nextMeetingDate = allDueDates.length > 0
+    ? new Date(Math.min(...allDueDates.map(d => d.getTime())))
+    : null;
+
+  if (!nextMeetingDate) return remainingLimit(member);
+
+  // Format back to D/M/YY for comparison
+  const nextDD = `${nextMeetingDate.getDate()}/${nextMeetingDate.getMonth()+1}/${String(nextMeetingDate.getFullYear()).slice(-2)}`;
+
   const repaying = loans
-    .filter(l => l.dueDate === '5/10/26' && l.principal >= MIN_LOAN_FOR_LIMIT)
+    .filter(l => l.dueDate === nextDD && l.principal >= MIN_LOAN_FOR_LIMIT)
     .reduce((s, l) => s + l.principal, 0);
-  // After repayment the limit freed = repaying amount
+
   return Math.max(0, remainingLimit(member) + repaying);
 }
 
@@ -1004,4 +1056,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   await syncFromSheet(false);
   animateCounters(); // re-init for any new KPI cards rendered
 });
-
