@@ -9,7 +9,7 @@ const SHEET_ID   = '1IUkCSOrmczIGYmYcTLgnrBK1cS9kH6CEkO-hKXR6kec';
 // Use gviz/tq with out:json — this endpoint sends correct CORS headers for live deployments.
 // The CSV endpoint (?tqx=out:csv) is blocked by browsers when the page is hosted online.
 const SHEET_BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=`;
-const CACHE_KEY  = 'we10bc_cache_v2';  // bumped from v1 → forces all visitors to re-fetch
+const CACHE_KEY  = 'we10bc_cache_v3';  // bumped: fixes date zero-padding bug in gviz parser
 const CACHE_TTL  = 6 * 60 * 60 * 1000; // 6 hours — sheet updates reflect same day
 
 // When opening via file://, fetch will be blocked by the browser.
@@ -356,18 +356,28 @@ function parseGvizJSON(raw) {
   return rows.map(row =>
     (row.c || []).map((cell, i) => {
       if (!cell || cell.v === null || cell.v === undefined) return '';
-      // Dates come as Date(year,month,day) objects — convert to DD/MM/YYYY string
+
       const type = cols[i]?.type;
-      if (type === 'date' && typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
-        const m = cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
-        if (m) {
-          const d = String(m[3]).padStart(2,'0');
-          const mo = String(Number(m[2])+1).padStart(2,'0');
-          const yr = m[1].slice(-2); // last 2 digits
-          return `${d}/${mo}/${yr}`;
+
+      // For date columns: ALWAYS prefer the formatted value (f) which Google
+      // already provides as 'D/M/YY' (e.g. '5/5/26') — exactly what classifyMonth
+      // and dueDate comparisons expect. Never reconstruct from v because that
+      // produces zero-padded '05/05/26' which breaks the regex matching.
+      if (type === 'date') {
+        if (cell.f !== undefined && cell.f !== null) return String(cell.f);
+        // Fallback: parse Date(year,month0,day) manually WITHOUT zero-padding
+        if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
+          const m = cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (m) {
+            const day = Number(m[3]);
+            const mo  = Number(m[2]) + 1; // 0-indexed → 1-indexed
+            const yr  = m[1].slice(-2);
+            return `${day}/${mo}/${yr}`;  // no zero-padding: '5/5/26' not '05/05/26'
+          }
         }
       }
-      // formatted value (f) is human-readable; raw value (v) is the number
+
+      // For all other columns: prefer formatted value, fall back to raw value
       return cell.f !== undefined && cell.f !== null ? String(cell.f) : String(cell.v);
     })
   );
@@ -442,8 +452,9 @@ async function syncFromSheet(force = false) {
 // ─────────────────────────────────────────────
 function saveCache(data) {
   try {
-    // Remove any old cache key from previous versions
+    // Remove any old cache keys from previous versions
     localStorage.removeItem('we10bc_cache');
+    localStorage.removeItem('we10bc_cache_v2');
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
   } catch (_) {}
 }
@@ -1046,8 +1057,8 @@ function animateCounters() {
 // INIT
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  // Remove stale cache from old key (was 'we10bc_cache' with 7-day TTL)
-  try { localStorage.removeItem('we10bc_cache'); } catch (_) {}
+  // Remove stale cache from old keys
+  try { localStorage.removeItem('we10bc_cache'); localStorage.removeItem('we10bc_cache_v2'); } catch (_) {}
 
   // 1. Render immediately with fallback data so the page feels instant
   renderAll();
